@@ -102,7 +102,6 @@ def test(loader1, mag_ref_path, agent_el, agent_de, iqa_metric, fout, model):
         p = np.squeeze(p, axis=0)
         p = np.transpose(p, (1, 2, 0))
         cv2.imwrite('./results/lol/set1/' + str(i) + '_output.png', p)
-        # cv2.imwrite('./results/lol/gt/' + str(i) + '_output.png', I)
     print("test total reward {a}, PSNR {b}".format(a=sum_reward * 255 / test_data_size, b=sum_psnr / test_data_size))
     print("UNIQUE:", unique_sum / test_data_size)
     print("UNIQUE_LABEL:", unique_sum_label / test_data_size)
