@@ -125,8 +125,6 @@ def main(fout):
     optimizer_el.setup(model_el)
 
     agent_el = pixelwise_a3c_el.PixelWiseA3C(model_el, optimizer_el, EPISODE_LEN, GAMMA)
-    # pixelwise_a3c.chainer.serializers.load_npz('./model/ex52_8000/model.npz', agent_el.model)
-    # agent_el.act_deterministically = True
     agent_el.model.to_gpu()
 
     # load myfcn model for de
