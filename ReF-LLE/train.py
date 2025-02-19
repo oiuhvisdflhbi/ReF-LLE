@@ -48,7 +48,6 @@ def test(loader1,loader2, agent_el, agent_de, fout, model):
     for i in range(0, test_data_size, TEST_BATCH_SIZE):
         raw_x = loader1.load_testing_data(np.array(range(i, i+TEST_BATCH_SIZE)))
         label = loader2.load_testing_data(np.array(range(i, i+TEST_BATCH_SIZE)))
-        #raw_n = np.random.normal(MEAN,SIGMA,raw_x.shape).astype(raw_x.dtype)/255
         current_state.reset(raw_x)
         reward = np.zeros(raw_x.shape, raw_x.dtype)*255
 
@@ -146,9 +145,6 @@ def main(fout):
     train_data_size = MiniBatchLoader.count_paths(TRAINING_DATA_PATH)
     indices = np.random.permutation(train_data_size)
     i = 0
-    #L_color = Myloss.L_color()
-    #L_spa = Myloss.L_spa()
-    #L_TV = Myloss.L_TV()
     L_exp = Myloss.L_exp(16, 0.6)
     L_color_rate = Myloss.L_color_rate()
     L_mag = Myloss.L_point_loss()
@@ -183,22 +179,13 @@ def main(fout):
             previous_image_tensor = torch.from_numpy(previous_image).cuda()
             current_state_tensor = torch.from_numpy(current_state.image).cuda()
             action_tensor = torch.from_numpy(action_value).cuda()
-            #loss_spa_cur = torch.mean(L_spa(current_state_tensor, raw_tensor))
-            # loss_col_cur = 50 * torch.mean(L_color(current_state_tensor))
-            #Loss_TV_cur = 200 * L_TV(current_state_tensor)
             loss_exp_cur = 100 * torch.mean(L_exp(current_state_tensor))
             loss_col_rate_pre = 40 * torch.mean(L_color_rate(previous_image_tensor, current_state_tensor))
-            #reward_previous = loss_spa_pre + loss_col_pre + loss_exp_pre + Loss_TV_pre + loss_col_rate_pre
-            #reward_current = loss_spa_cur + loss_exp_cur + Loss_TV_cur + loss_col_rate_pre
-            #print("loss_TV:",Loss_TV_cur,"  loss_spa_cur:",loss_spa_cur.data,"   loss_exp_cur:",loss_exp_cur.data,"  loss_col_rate_pre:",loss_col_rate_pre.data)
             loss_mag = 10*L_mag(current_state.image_mag)
             unique_score = iqa_metric(current_state_tensor) - iqa_metric(raw_tensor)
             print("unique_score.mean: ",unique_score.mean(),"loss_mag: ",loss_mag)
             fout.write("unique_score.mean: {a}  loss_mag: {b}  loss_col_rate_pre: {c} \n".format(a=unique_score.mean(),b=loss_exp_cur, c=loss_col_rate_pre))
-            #reward_current = unique_score.mean() * 600 - loss_mag
-            reward_current = - loss_mag
-            #reward_current =  - loss_mag
-            #reward_current = loss_spa_cur + loss_exp_cur + loss_col_rate_pre
+            reward_current = unique_score.mean() * 600 - loss_mag
             reward =  reward_current
             reward_de = reward.cpu().numpy()
             sum_reward += np.mean(reward_de) * np.power(GAMMA, t)
