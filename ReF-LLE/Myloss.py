@@ -34,7 +34,6 @@ class L_point_loss(nn.Module):
         center_y = image.shape[2] // 2
         exp_point = image[:, center_x, center_y]
         loss = np.abs(5000000 / exp_point - 1)
-        #loss = 0.6 * np.abs(20000 / area_a_mean - 1) + 0.2 * np.abs(2500 / area_b_mean - 1) + 0.2 * np.abs(1200 / area_c_mean - 1)
         return loss.mean()        
 class L_area_measure(nn.Module):
     def __init__(self):
