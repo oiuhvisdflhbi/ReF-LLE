@@ -23,36 +23,6 @@ class L_color(nn.Module):
 
         return k
 
-class L_area_loss(nn.Module):
-    def __init__(self):
-        super(L_area_loss, self).__init__()
-
-    def forward(self, image):
-        image = image.mean(axis=1)
-        #print(image.shape)
-        center_x = image.shape[1] // 2
-        center_y = image.shape[2] // 2
-
-        area1 = image[:, center_y-25:center_y+25, center_x-25:center_x+25]
-        area2 = image[:, center_y-80:center_y+80, center_x-80:center_x+80]
-        area3 = image
-        #print(area1.shape)
-        area1_n = area1.size(1)*area1.size(2)
-        area2_n = area2.size(1)*area2.size(2)
-        area3_n = area3.size(1)*area3.size(2)
-        #print(area1_n.shape)
-        #print(area1_n)
-        area_a_mean = area1.mean(dim=(1,2))
-        area_b_mean = (area2.sum(dim=(1,2)) - area1.sum(dim=(1,2))) / (area2_n - area1_n)
-        area_c_mean = (area3.sum(dim=(1,2)) - area2.sum(dim=(1,2))) / (area3_n - area2_n)
-        #print("Mean of Area 1:", area_a_mean)
-        #print("Mean of Area 2:", area_b_mean)
-        #print("Mean of Area 3:", area_c_mean)
-        #loss = np.abs(6000000/image.max()-1)
-        #loss = 0.2 * np.exp(np.abs(20000 / np.maximum(area_a_mean, 600) - 1)) + 0.6 * np.exp(np.abs(2500 / np.maximum(area_b_mean, 200) - 1)) + 0.2 * np.exp(np.abs(1200 / np.maximum(area_c_mean, 150) - 1))
-        #loss = np.log(loss)
-        loss = 0.6 * np.abs(20000 / area_a_mean - 1) + 0.2 * np.abs(2500 / area_b_mean - 1) + 0.2 * np.abs(1200 / area_c_mean - 1)
-        return loss.mean()
 class L_point_loss(nn.Module):
     def __init__(self):
         super(L_point_loss, self).__init__()
