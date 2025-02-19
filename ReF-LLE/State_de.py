@@ -38,28 +38,11 @@ class State_de():
         print("moves:  ",moves[:, 0, :, :].max(),moves[:, 0, :, :].min(),moves[:, 0, :, :].mean())
         _,_,H,W = self.image.shape
         moved_image_mag = torch.from_numpy(np.zeros(self.image.shape, dtype=np.float32))
-        # de = move[:, 3:, :, :]
         image_mag = self.image_mag
-        #scale = image_mag.max()
-        #image_mag/=scale
-        #r = image_mag[:, 0, :, :]
-        #print("r",r.max(),r.min(),r.mean())
-        #g = image_mag[:, 1, :, :]
-        #print("g",g.max(),g.min(),g.mean())
-        #b = image_mag[:, 2, :, :]
-        #print("b",b.max(),b.min(),b.mean())
-        #moved_image_mag[:, 0, :, :] = r + (moves[:, 0, :, :]) * r * (1 - r)
-        #moved_image_mag[:, 1, :, :] = g + (0.1 * moves[:, 1, :, :] + 0.9 * moves[:, 0, :, :]) * g * (1 - g)
-        #moved_image_mag[:, 2, :, :] = b + (0.1 * moves[:, 2, :, :] + 0.9 * moves[:, 0, :, :]) * b * (1 - b)
-        #moved_image_mag[:, 0, :, :] = g + (moves[:, 1, :, :]) * g * (1 - g)
-        #moved_image_mag[:, 0, :, :] = b + (moves[:, 2, :, :]) * b * (1 - b)
         moves[:, 0, :, :] = moves[:, 0, :, :]
-        #moves[:, 1, :, :] = 0.2 * np.exp(moves[:, 1, :, :]) + 0.8 * moves[:, 0, :, :]
-        #moves[:, 2, :, :] = 0.2 * np.exp(moves[:, 2, :, :]) + 0.8 * moves[:, 0, :, :]
         moves[:, 1, :, :] = moves[:, 0, :, :]
         moves[:, 2, :, :] = moves[:, 0, :, :]
         moved_image_mag = np.exp(moves) * image_mag
-        #moved_image_mag = moves * image_mag
         self.image_mag = moved_image_mag
         real = moved_image_mag * torch.cos(self.image_pha)
         imag = moved_image_mag * torch.sin(self.image_pha)
@@ -71,7 +54,6 @@ class State_de():
         image_out = image_out/255
         
         self.image = 0.8 * image_out + 0.2 * self.image
-        #self.image = image_out
 
     def step_de(self, act_b):
         pix_num = act_b.shape[1] * act_b.shape[2]
@@ -118,8 +100,6 @@ class State_de():
                 imorig_tensor = Variable(imorig_tensor.type(dtype))
                 nsigma_tensor = Variable(torch.FloatTensor(nsigma).type(dtype))
 
-            #print(f"imorig_tensor shape: {imorig_tensor.shape}, nsigma_tensor shape: {nsigma_tensor.shape}")
-            #print(f"nsigma_pixel value range: {nsigma_tensor.min()} - {nsigma_tensor.max()}")
 
             # Estimate noise and subtract it from the input image
             im_noise_estim = self.net(imorig_tensor, nsigma_tensor)
@@ -134,4 +114,4 @@ class State_de():
                 outim_np = outim_np[:, :, :, :-1]
 
             # Store the processed image back
-            self.image[i] = outim_np.squeeze(0)  # Remove the extra dimension added by expand_dims
+            self.image[i] = outim_np.squeeze(0) 
